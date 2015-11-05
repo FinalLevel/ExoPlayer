@@ -15,27 +15,16 @@
  */
 package com.google.android.exoplayer.extractor;
 
-import com.google.android.exoplayer.C;
-import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.MediaFormatHolder;
-import com.google.android.exoplayer.ParserException;
-import com.google.android.exoplayer.SampleHolder;
-import com.google.android.exoplayer.SampleSource;
-import com.google.android.exoplayer.SampleSource.SampleSourceReader;
-import com.google.android.exoplayer.TrackRenderer;
-import com.google.android.exoplayer.drm.DrmInitData;
-import com.google.android.exoplayer.upstream.Allocator;
-import com.google.android.exoplayer.upstream.DataSource;
-import com.google.android.exoplayer.upstream.DataSpec;
-import com.google.android.exoplayer.upstream.DefaultAllocator;
-import com.google.android.exoplayer.upstream.Loader;
-import com.google.android.exoplayer.upstream.Loader.Loadable;
-import com.google.android.exoplayer.util.Assertions;
-import com.google.android.exoplayer.util.Util;
-
 import android.net.Uri;
 import android.os.SystemClock;
 import android.util.SparseArray;
+import com.google.android.exoplayer.*;
+import com.google.android.exoplayer.SampleSource.SampleSourceReader;
+import com.google.android.exoplayer.drm.DrmInitData;
+import com.google.android.exoplayer.upstream.*;
+import com.google.android.exoplayer.upstream.Loader.Loadable;
+import com.google.android.exoplayer.util.Assertions;
+import com.google.android.exoplayer.util.Util;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -80,6 +69,10 @@ public final class ExtractorSampleSource implements SampleSource, SampleSourceRe
     }
 
   }
+
+	public interface Listener {
+		void onLoadError(IOException e, int currentLoadableExceptionCount);
+	}
 
   /**
    * The default minimum number of times to retry loading prior to failing for on-demand streams.
@@ -184,6 +177,7 @@ public final class ExtractorSampleSource implements SampleSource, SampleSourceRe
   private int currentLoadableExceptionCount;
   private long currentLoadableExceptionTimestamp;
   private boolean loadingFinished;
+	private Listener _listener;
 
   private int extractedSampleCount;
   private int extractedSampleCountAtStartOfLoad;
@@ -504,6 +498,11 @@ public final class ExtractorSampleSource implements SampleSource, SampleSourceRe
     }
   }
 
+	public void setListener(Listener listener)
+	{
+		_listener = listener;
+	}
+
   @Override
   public void onLoadError(Loadable ignored, IOException e) {
     currentLoadableException = e;
@@ -511,6 +510,9 @@ public final class ExtractorSampleSource implements SampleSource, SampleSourceRe
         : currentLoadableExceptionCount + 1;
     currentLoadableExceptionTimestamp = SystemClock.elapsedRealtime();
     maybeStartLoading();
+	  if (_listener != null) {
+		  _listener.onLoadError(e, currentLoadableExceptionCount);
+	  }
   }
 
   // ExtractorOutput implementation.
