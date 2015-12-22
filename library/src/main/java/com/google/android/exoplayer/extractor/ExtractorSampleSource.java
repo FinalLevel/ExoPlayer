@@ -517,10 +517,10 @@ public final class ExtractorSampleSource implements SampleSource, SampleSourceRe
     currentLoadableExceptionCount = extractedSampleCount > extractedSampleCountAtStartOfLoad ? 1
         : currentLoadableExceptionCount + 1;
     currentLoadableExceptionTimestamp = SystemClock.elapsedRealtime();
+    if (_listener != null) {
+      _listener.onLoadError(e, currentLoadableExceptionCount);
+    }
     maybeStartLoading();
-	  if (_listener != null) {
-		  _listener.onLoadError(e, currentLoadableExceptionCount);
-	  }
   }
 
   // ExtractorOutput implementation.
