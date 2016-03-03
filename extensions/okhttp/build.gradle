@@ -35,7 +35,7 @@ android {
 }
 
 dependencies {
-    compile project(':library')
+    compile project(':ExoPlayer:library')
     compile('com.squareup.okhttp3:okhttp:+') {
         exclude group: 'org.json'
     }
