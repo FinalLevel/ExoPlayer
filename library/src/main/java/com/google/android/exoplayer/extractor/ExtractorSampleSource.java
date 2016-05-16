@@ -82,7 +82,7 @@ public final class ExtractorSampleSource implements SampleSource, SampleSourceRe
      * @param sourceId The id of the reporting {@link SampleSource}.
      * @param e The cause of the failure.
      */
-    void onLoadError(int sourceId, IOException e);
+    void onLoadError(int sourceId, IOException e, int currentLoadableExceptionCount);
 
   }
 
@@ -97,10 +97,6 @@ public final class ExtractorSampleSource implements SampleSource, SampleSourceRe
     }
 
   }
-
-	public interface Listener {
-		void onLoadError(IOException e, int currentLoadableExceptionCount);
-	}
 
   /**
    * The default minimum number of times to retry loading prior to failing for on-demand streams.
@@ -243,7 +239,6 @@ public final class ExtractorSampleSource implements SampleSource, SampleSourceRe
   private int currentLoadableExceptionCount;
   private long currentLoadableExceptionTimestamp;
   private boolean loadingFinished;
-	private Listener _listener;
 
   private int extractedSampleCount;
   private int extractedSampleCountAtStartOfLoad;
@@ -588,21 +583,13 @@ public final class ExtractorSampleSource implements SampleSource, SampleSourceRe
     }
   }
 
-	public void setListener(Listener listener)
-	{
-		_listener = listener;
-	}
-
   @Override
   public void onLoadError(Loadable ignored, IOException e) {
     currentLoadableException = e;
     currentLoadableExceptionCount = extractedSampleCount > extractedSampleCountAtStartOfLoad ? 1
         : currentLoadableExceptionCount + 1;
     currentLoadableExceptionTimestamp = SystemClock.elapsedRealtime();
-    if (_listener != null) {
-      _listener.onLoadError(e, currentLoadableExceptionCount);
-    }
-    notifyLoadError(e);
+    notifyLoadError(e, currentLoadableExceptionCount);
     maybeStartLoading();
   }
 
@@ -760,12 +747,12 @@ public final class ExtractorSampleSource implements SampleSource, SampleSourceRe
     return Math.min((errorCount - 1) * 1000, 5000);
   }
 
-  private void notifyLoadError(final IOException e) {
+  private void notifyLoadError(final IOException e, final int currentLoadableExceptionCount) {
     if (eventHandler != null && eventListener != null) {
       eventHandler.post(new Runnable()  {
         @Override
         public void run() {
-          eventListener.onLoadError(eventSourceId, e);
+          eventListener.onLoadError(eventSourceId, e, currentLoadableExceptionCount);
         }
       });
     }
