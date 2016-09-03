@@ -17,10 +17,6 @@ package com.google.android.exoplayer.playbacktests.util;
 
 import static junit.framework.Assert.fail;
 
-import com.google.android.exoplayer.playbacktests.R;
-import com.google.android.exoplayer.util.Assertions;
-import com.google.android.exoplayer.util.Util;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -36,6 +32,9 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.Window;
+import com.google.android.exoplayer.playbacktests.R;
+import com.google.android.exoplayer.util.Assertions;
+import com.google.android.exoplayer.util.Util;
 
 /**
  * A host activity for performing playback tests.
@@ -125,13 +124,15 @@ public final class HostActivity extends Activity implements SurfaceHolder.Callba
         hostedTest.onFinished();
         Log.d(TAG, "Pass conditions checked.");
       } else {
-        Log.e(TAG, "Test released before it finished. Activity may have been paused whilst test "
-            + "was in progress.");
-        fail();
+        String message = "Test released before it finished. Activity may have been paused whilst "
+            + "test was in progress.";
+        Log.e(TAG, message);
+        fail(message);
       }
     } else {
-      Log.e(TAG, "Test timed out after " + timeoutMs + " ms.");
-      fail();
+      String message = "Test timed out after " + timeoutMs + " ms.";
+      Log.e(TAG, message);
+      fail(message);
     }
   }
 

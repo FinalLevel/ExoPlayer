@@ -15,6 +15,7 @@
  */
 package com.google.android.exoplayer.ext.flac;
 
+import android.os.Handler;
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.CodecCounters;
 import com.google.android.exoplayer.ExoPlaybackException;
@@ -29,9 +30,6 @@ import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.extensions.Buffer;
 import com.google.android.exoplayer.util.extensions.InputBuffer;
-
-import android.os.Handler;
-
 import java.util.List;
 
 /**
@@ -263,6 +261,9 @@ public final class LibflacAudioTrackRenderer extends SampleSourceTrackRenderer
       return false;
     }
 
+    if (inputBuffer.sampleHolder.isDecodeOnly()) {
+      inputBuffer.setFlag(Buffer.FLAG_DECODE_ONLY);
+    }
     decoder.queueInputBuffer(inputBuffer);
     inputBuffer = null;
     return true;

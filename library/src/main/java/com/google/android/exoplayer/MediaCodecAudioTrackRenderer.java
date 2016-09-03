@@ -15,12 +15,6 @@
  */
 package com.google.android.exoplayer;
 
-import com.google.android.exoplayer.MediaCodecUtil.DecoderQueryException;
-import com.google.android.exoplayer.audio.AudioCapabilities;
-import com.google.android.exoplayer.audio.AudioTrack;
-import com.google.android.exoplayer.drm.DrmSessionManager;
-import com.google.android.exoplayer.util.MimeTypes;
-
 import android.annotation.TargetApi;
 import android.media.AudioManager;
 import android.media.MediaCodec;
@@ -28,7 +22,11 @@ import android.media.PlaybackParams;
 import android.media.audiofx.Virtualizer;
 import android.os.Handler;
 import android.os.SystemClock;
-
+import com.google.android.exoplayer.MediaCodecUtil.DecoderQueryException;
+import com.google.android.exoplayer.audio.AudioCapabilities;
+import com.google.android.exoplayer.audio.AudioTrack;
+import com.google.android.exoplayer.drm.DrmSessionManager;
+import com.google.android.exoplayer.util.MimeTypes;
 import java.nio.ByteBuffer;
 
 /**
@@ -214,7 +212,7 @@ public class MediaCodecAudioTrackRenderer extends MediaCodecTrackRenderer implem
       throws DecoderQueryException {
     String mimeType = mediaFormat.mimeType;
     return MimeTypes.isAudio(mimeType) && (MimeTypes.AUDIO_UNKNOWN.equals(mimeType)
-        || (allowPassthrough(mimeType) && mediaCodecSelector.getPassthroughDecoderName() != null)
+        || (allowPassthrough(mimeType) && mediaCodecSelector.getPassthroughDecoderInfo() != null)
         || mediaCodecSelector.getDecoderInfo(mimeType, false) != null);
   }
 
@@ -222,10 +220,10 @@ public class MediaCodecAudioTrackRenderer extends MediaCodecTrackRenderer implem
   protected DecoderInfo getDecoderInfo(MediaCodecSelector mediaCodecSelector, String mimeType,
       boolean requiresSecureDecoder) throws DecoderQueryException {
     if (allowPassthrough(mimeType)) {
-      String passthroughDecoderName = mediaCodecSelector.getPassthroughDecoderName();
-      if (passthroughDecoderName != null) {
+      DecoderInfo passthroughDecoderInfo = mediaCodecSelector.getPassthroughDecoderInfo();
+      if (passthroughDecoderInfo != null) {
         passthroughEnabled = true;
-        return new DecoderInfo(passthroughDecoderName, null);
+        return passthroughDecoderInfo;
       }
     }
     passthroughEnabled = false;

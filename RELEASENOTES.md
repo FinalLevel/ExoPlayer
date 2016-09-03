@@ -1,5 +1,20 @@
 # Release notes #
 
+### r1.5.10 ###
+
+* HLS: Stability fixes.
+* MP4: Support for stz2 Atoms.
+* Enable 4K format selection on Sony AndroidTV + nVidia SHIELD.
+* TX3G caption fixes.
+
+### r1.5.9 ###
+
+* MP4: Fixed incorrect sniffing in some cases (#1523).
+* MP4: Improved file compatibility (#1567).
+* ID3: Support for TIT2 and APIC frames.
+* Fixed querying of platform decoders on some devices.
+* Misc bug fixes.
+
 ### r1.5.8 ###
 
 * HLS: Fix handling of HTTP redirects.
